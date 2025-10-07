@@ -1,0 +1,80 @@
+import { purpleTheme } from "@/constants/color";
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: purpleTheme.background,
+  },
+  heading: {
+    color: purpleTheme.text,
+    fontSize: 30,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  inputFlexWrapper: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 5,
+    width: "100%",
+    marginBottom: 15,
+  },
+  inputFlex: {
+    color: purpleTheme.text,
+    flex: 1,
+    padding: 10,
+    borderColor: purpleTheme.border,
+    borderWidth: 1,
+    borderRadius: 5,
+    width: "100%",
+    height: 55,
+    fontSize: 16,
+    backgroundColor: purpleTheme.background,
+  },
+  input: {
+    color: purpleTheme.text,
+    padding: 10,
+    borderColor: purpleTheme.border,
+    borderWidth: 1,
+    borderRadius: 5,
+    width: "100%",
+    height: 55,
+    fontSize: 16,
+    backgroundColor: purpleTheme.background,
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: purpleTheme.button,
+    padding: 15,
+    borderRadius: 5,
+    width: "100%",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  buttonText: {
+    color: purpleTheme.white,
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  linkContainer: {
+    flexDirection: "row",
+    marginTop: 20,
+  },
+  linkText: { color: purpleTheme.button, fontWeight: "bold" },
+  errorContainer: {
+    marginBottom: 10,
+    width: "100%",
+    backgroundColor: purpleTheme.errorbackground,
+    padding: 10,
+    borderRadius: 5,
+  },
+  errorText: {
+    color: purpleTheme.errortext,
+    fontWeight: "bold",
+    fontSize: 16,
+    textAlign: "center",
+  },
+});
