@@ -15,7 +15,7 @@ const login = () => {
 
   return (
     <LinearGradient
-      colors={purpleTheme.gradient.lightbackground}
+      colors={purpleTheme.gradient.background}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}

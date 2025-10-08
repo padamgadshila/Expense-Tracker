@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
     width: "100%",
     height: 55,
     fontSize: 16,
-    backgroundColor: purpleTheme.background,
+    backgroundColor: purpleTheme.surface,
   },
   input: {
     color: purpleTheme.text,
@@ -55,7 +55,7 @@ export const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonText: {
-    color: purpleTheme.white,
+    color: purpleTheme.buttonText,
     fontSize: 20,
     fontWeight: "bold",
   },
@@ -63,16 +63,16 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: 20,
   },
-  linkText: { color: purpleTheme.button, fontWeight: "bold" },
+  linkText: { color: purpleTheme.primary, fontWeight: "bold" },
   errorContainer: {
     marginBottom: 10,
     width: "100%",
-    backgroundColor: purpleTheme.errorbackground,
+    backgroundColor: purpleTheme.error.background,
     padding: 10,
     borderRadius: 5,
   },
   errorText: {
-    color: purpleTheme.errortext,
+    color: purpleTheme.error.text,
     fontWeight: "bold",
     fontSize: 16,
     textAlign: "center",
