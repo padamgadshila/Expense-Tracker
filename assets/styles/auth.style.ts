@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
     width: "100%",
     height: 55,
     fontSize: 16,
-    backgroundColor: purpleTheme.surface,
+    backgroundColor: purpleTheme.background,
   },
   input: {
     color: purpleTheme.text,

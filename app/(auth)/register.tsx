@@ -1,5 +1,8 @@
 import { styles } from "@/assets/styles/auth.style";
 import { purpleTheme } from "@/constants/color";
+import { api } from "@/convex/_generated/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useMutation } from "convex/react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -8,6 +11,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 const register = () => {
   const router = useRouter();
+  const registerUser = useMutation(api.users.registerUser);
 
   const [fname, setFname] = useState("");
   const [lname, setLname] = useState("");
@@ -17,7 +21,7 @@ const register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     try {
       setLoading(true);
       if (!fname || !lname || !email || !password || !Cpassword) {
@@ -25,13 +29,27 @@ const register = () => {
         return;
       }
       setError("");
+
       if (password !== Cpassword) {
         setError("Passwords do not match");
         return;
       }
+      const userId = await registerUser({
+        fname,
+        lname,
+        email,
+        password,
+      });
+
+      await AsyncStorage.setItem("userId", userId);
+      router.push("/(home)");
       setError("");
     } catch (error) {
-      setError("Something went wrong");
+      if (typeof error === "object" && error !== null && "data" in error) {
+        setError((error as any).data);
+      } else {
+        setError("An unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }
