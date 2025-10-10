@@ -2,7 +2,7 @@ import { styles } from "@/assets/styles/auth.style";
 import { purpleTheme } from "@/constants/color";
 import { api } from "@/convex/_generated/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useMutation } from "convex/react";
+import { useAction } from "convex/react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -11,7 +11,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 const register = () => {
   const router = useRouter();
-  const registerUser = useMutation(api.users.registerUser);
+  const registerUser = useAction(api.useAction.registerUserAction);
 
   const [fname, setFname] = useState("");
   const [lname, setLname] = useState("");
@@ -34,14 +34,19 @@ const register = () => {
         setError("Passwords do not match");
         return;
       }
-      const userId = await registerUser({
+      const user = await registerUser({
         fname,
         lname,
         email,
         password,
       });
 
-      await AsyncStorage.setItem("userId", userId);
+      await AsyncStorage.multiSet([
+        ["email", user.email],
+        ["userId", user._id],
+        ["fname", user.fname],
+      ]);
+
       router.push("/(home)");
       setError("");
     } catch (error) {

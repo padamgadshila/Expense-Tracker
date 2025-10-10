@@ -27,23 +27,25 @@ export const registerUser = mutation({
       createdAt: new Date().toISOString(),
     });
 
-    return userId;
+    const newUser = await ctx.db.get(userId);
+
+    if (!newUser) {
+      throw new ConvexError("User creation failed");
+    }
+    const { password: _, ...safeUser } = newUser;
+    return safeUser;
   },
 });
 
-export const loginUser = mutation({
-  args: { email: v.string(), password: v.string() },
-  handler: async (ctx, { email, password }) => {
+export const getUserByEmail = mutation({
+  args: { email: v.string() },
+  handler: async (ctx, { email }) => {
     const user = await ctx.db
       .query("users")
       .withIndex("email", (q) => q.eq("email", email))
       .first();
 
     if (!user) throw new ConvexError("User not found");
-
-    if (password !== user.password)
-      throw new ConvexError("Password is incorrect");
-
-    return user._id;
+    return user;
   },
 });

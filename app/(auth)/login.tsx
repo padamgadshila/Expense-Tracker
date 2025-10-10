@@ -2,14 +2,14 @@ import { styles } from "@/assets/styles/auth.style";
 import { purpleTheme } from "@/constants/color";
 import { api } from "@/convex/_generated/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useMutation } from "convex/react";
+import { useAction } from "convex/react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 const login = () => {
   const router = useRouter();
-  const loginUser = useMutation(api.users.loginUser);
+  const loginUser = useAction(api.useAction.loginUserAction);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,9 +27,13 @@ const login = () => {
 
       setError("");
 
-      const userId = await loginUser({ email, password });
-      await AsyncStorage.setItem("userId", userId);
-      console.log("Retrieved userId:", userId);
+      const user = await loginUser({ email, password });
+      await AsyncStorage.multiSet([
+        ["email", user.email],
+        ["userId", user._id],
+        ["fname", user.fname],
+      ]);
+
       router.push("/(home)");
     } catch (error) {
       if (typeof error === "object" && error !== null && "data" in error) {
