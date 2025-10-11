@@ -51,7 +51,7 @@ const Index = () => {
       style={{ flex: 1, padding: 15 }}
     >
       <View style={styles.namecontainer}>
-        <Text style={styles.nameText}>Welcome, {name}</Text>
+        <Text style={styles.nameText}>Hello, {name} 👋</Text>
         <FontAwesome
           name="sign-out"
           onPress={logout}
@@ -59,18 +59,47 @@ const Index = () => {
         />
       </View>
 
-      <View style={styles.balanceContainer}>
-        <Text style={styles.greyText}>Total Balance</Text>
+      <View style={styles.card}>
+        <Text style={styles.greyText}>Balance</Text>
         <Text style={styles.balance} onPress={toggleTheme}>
           ₹500000
         </Text>
         <View style={styles.splitCont}>
-          <View>
-            <Text>Income</Text>
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              width: "50%",
+            }}
+          >
+            <Text
+              style={{
+                color: colors.grayText,
+                fontSize: 16,
+                fontWeight: "600",
+              }}
+            >
+              Income
+            </Text>
             <Text style={styles.incomeText}>₹500000</Text>
           </View>
-          <View>
-            <Text>Expenses</Text>
+          <View style={styles.line} />
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              width: "50%",
+            }}
+          >
+            <Text
+              style={{
+                color: colors.grayText,
+                fontSize: 16,
+                fontWeight: "600",
+              }}
+            >
+              Expenses
+            </Text>
             <Text style={styles.expenseText}>₹500000</Text>
           </View>
         </View>

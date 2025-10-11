@@ -81,12 +81,12 @@ export const useStyles = () => {
     errorContainer: {
       marginBottom: 15,
       width: "100%",
-      backgroundColor: colors.feedback.errorBg,
+      backgroundColor: colors.error.background,
       padding: 10,
       borderRadius: 5,
     },
     errorText: {
-      color: colors.feedback.error,
+      color: colors.error.text,
       fontWeight: "bold",
       fontSize: 19,
       textAlign: "center",

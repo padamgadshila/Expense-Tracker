@@ -6,7 +6,6 @@ export const useStyles = () => {
 
   return StyleSheet.create({
     namecontainer: {
-      // backgroundColor: colors,
       padding: 10,
       borderRadius: 10,
       flexDirection: "row",
@@ -15,20 +14,26 @@ export const useStyles = () => {
     },
 
     nameText: {
-      color: colors.text,
+      color: colors.primary,
       fontWeight: "bold",
-      fontSize: 25,
+      fontSize: 30,
     },
 
     logoutIcon: {
       color: colors.primary,
-      fontSize: 40,
+      fontSize: 30,
     },
-    balanceContainer: {
-      marginTop: 20,
-      // backgroundColor: purpleTheme.background,
-      padding: 20,
-      borderRadius: 10,
+
+    card: {
+      backgroundColor: colors.input.background,
+      borderRadius: 12,
+      padding: 16,
+      margin: 8,
+      shadowColor: colors.shadowColor,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 6,
+      elevation: 3,
     },
     greyText: {
       color: colors.grayText,
@@ -43,16 +48,22 @@ export const useStyles = () => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
+      marginTop: 20,
+    },
+    line: {
+      backgroundColor: colors.grayText,
+      height: 40,
+      width: 1,
     },
     incomeText: {
-      color: colors.feedback.success,
+      color: colors.success.text,
       fontSize: 23,
-      fontWeight: 500,
+      fontWeight: "bold",
     },
     expenseText: {
-      color: colors.feedback.error,
+      color: colors.error.text,
       fontSize: 23,
-      fontWeight: 500,
+      fontWeight: "bold",
     },
   });
 };
