@@ -87,12 +87,14 @@ const register = () => {
           <TextInput
             style={styles.inputFlex}
             placeholder="First name"
+            placeholderTextColor={colors.input.placeHolder}
             value={fname}
             onChangeText={setFname}
           />
           <TextInput
             style={styles.inputFlex}
             placeholder="Last name"
+            placeholderTextColor={colors.input.placeHolder}
             value={lname}
             onChangeText={setLname}
           />
@@ -100,12 +102,14 @@ const register = () => {
         <TextInput
           style={styles.input}
           placeholder="Email"
+          placeholderTextColor={colors.input.placeHolder}
           value={email}
           onChangeText={setemail}
         />
         <TextInput
           style={styles.input}
           placeholder="Create Password"
+          placeholderTextColor={colors.input.placeHolder}
           value={password}
           onChangeText={setPassword}
           secureTextEntry={true}
@@ -113,6 +117,7 @@ const register = () => {
         <TextInput
           style={styles.input}
           placeholder="Confirm Password"
+          placeholderTextColor={colors.input.placeHolder}
           value={Cpassword}
           onChangeText={setCPassword}
           secureTextEntry={true}

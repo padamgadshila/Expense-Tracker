@@ -10,7 +10,7 @@ const Index = () => {
   const [name, setName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { colors } = useTheme();
+  const { colors, toggleTheme } = useTheme();
   const styles = useStyles();
   useEffect(() => {
     const fetchUserData = async () => {
@@ -61,7 +61,9 @@ const Index = () => {
 
       <View style={styles.balanceContainer}>
         <Text style={styles.greyText}>Total Balance</Text>
-        <Text style={styles.balance}>₹500000</Text>
+        <Text style={styles.balance} onPress={toggleTheme}>
+          ₹500000
+        </Text>
         <View style={styles.splitCont}>
           <View>
             <Text>Income</Text>

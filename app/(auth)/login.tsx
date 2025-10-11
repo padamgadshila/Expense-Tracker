@@ -65,6 +65,7 @@ const login = () => {
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor={colors.input.placeHolder}
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
@@ -73,6 +74,7 @@ const login = () => {
       <TextInput
         style={styles.input}
         placeholder="Password"
+        placeholderTextColor={colors.input.placeHolder}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
