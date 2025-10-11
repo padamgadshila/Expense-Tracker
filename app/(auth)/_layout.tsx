@@ -14,7 +14,7 @@ const AuthLayout = () => {
 
         if (userId) {
           // user already logged in → go to home
-          router.replace("/(home)/");
+          router.replace("/(home)");
         }
       } catch (error) {
         console.error("Error checking auth:", error);

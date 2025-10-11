@@ -2,7 +2,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const HomeLayout = () => {
   const router = useRouter();
@@ -39,11 +38,7 @@ const HomeLayout = () => {
 
   if (!isLoggedIn) return null;
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Stack screenOptions={{ headerShown: false }} />
-    </SafeAreaView>
-  );
+  return <Stack screenOptions={{ headerShown: false }} />;
 };
 
 export default HomeLayout;
