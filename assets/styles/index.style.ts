@@ -14,7 +14,7 @@ export const useStyles = () => {
     },
 
     nameText: {
-      color: colors.primary,
+      color: colors.grayText,
       fontWeight: "bold",
       fontSize: 30,
     },
@@ -28,7 +28,7 @@ export const useStyles = () => {
       backgroundColor: colors.input.background,
       borderRadius: 12,
       padding: 16,
-      margin: 8,
+      // margin: 8,
       shadowColor: colors.shadowColor,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.2,
@@ -48,7 +48,7 @@ export const useStyles = () => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      marginTop: 20,
+      marginTop: 10,
     },
     line: {
       backgroundColor: colors.grayText,
@@ -64,6 +64,38 @@ export const useStyles = () => {
       color: colors.error.text,
       fontSize: 23,
       fontWeight: "bold",
+    },
+
+    list: {
+      marginTop: 10,
+      backgroundColor: colors.input.background,
+      borderRadius: 15,
+      shadowColor: colors.shadowColor,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 6,
+      elevation: 3,
+      paddingHorizontal: 10,
+      paddingVertical: 10,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    iconCont: {
+      height: 50,
+      width: 50,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 10,
+    },
+    listIcon: {
+      fontSize: 30,
+    },
+    listSplit: {
+      width: "68%",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
     },
   });
 };

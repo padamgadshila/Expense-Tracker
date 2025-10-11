@@ -16,7 +16,7 @@ const HomeTabs = () => {
           shadowColor: colors.shadowColor,
           borderTopWidth: 1,
           borderColor: "#ccc",
-          paddingTop: 10,
+          paddingTop: 5,
           paddingHorizontal: 30,
           alignItems: "center",
           height: 70,
