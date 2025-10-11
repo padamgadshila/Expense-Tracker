@@ -1,6 +1,6 @@
-import { styles } from "@/assets/styles/auth.style";
-import { purpleTheme } from "@/constants/color";
+import { useStyles } from "@/assets/styles/auth.style";
 import { api } from "@/convex/_generated/api";
+import { useTheme } from "@/hooks/themeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAction } from "convex/react";
 import { LinearGradient } from "expo-linear-gradient";
@@ -12,6 +12,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 const register = () => {
   const router = useRouter();
   const registerUser = useAction(api.useAction.registerUserAction);
+  const styles = useStyles();
+  const { colors } = useTheme();
 
   const [fname, setFname] = useState("");
   const [lname, setLname] = useState("");
@@ -69,7 +71,7 @@ const register = () => {
       style={{ flex: 1 }}
     >
       <LinearGradient
-        colors={purpleTheme.gradient.background}
+        colors={colors.gradient.background}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.container}
@@ -118,7 +120,7 @@ const register = () => {
 
         <TouchableOpacity style={{ width: "100%" }} onPress={handleRegister}>
           <LinearGradient
-            colors={purpleTheme.gradient.button}
+            colors={colors.button.background}
             style={styles.button}
           >
             {loading ? (
@@ -130,7 +132,7 @@ const register = () => {
         </TouchableOpacity>
 
         <View style={styles.linkContainer}>
-          <Text>Already have an account? </Text>
+          <Text style={styles.linkGreyText}>Already have an account? </Text>
           <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
             <Text style={styles.linkText}>Login here</Text>
           </TouchableOpacity>

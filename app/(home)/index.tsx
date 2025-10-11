@@ -1,5 +1,5 @@
-import { styles } from "@/assets/styles/index.style";
-import { purpleTheme } from "@/constants/color";
+import { useStyles } from "@/assets/styles/index.style";
+import { useTheme } from "@/hooks/themeContext";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
@@ -10,7 +10,8 @@ const Index = () => {
   const [name, setName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
+  const { colors } = useTheme();
+  const styles = useStyles();
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -46,7 +47,7 @@ const Index = () => {
 
   return (
     <LinearGradient
-      colors={purpleTheme.gradient.background}
+      colors={colors.gradient.background}
       style={{ flex: 1, padding: 15 }}
     >
       <View style={styles.namecontainer}>

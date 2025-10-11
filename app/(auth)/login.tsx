@@ -1,6 +1,6 @@
-import { styles } from "@/assets/styles/auth.style";
-import { purpleTheme } from "@/constants/color";
+import { useStyles } from "@/assets/styles/auth.style";
 import { api } from "@/convex/_generated/api";
+import { useTheme } from "@/hooks/themeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAction } from "convex/react";
 import { LinearGradient } from "expo-linear-gradient";
@@ -9,8 +9,9 @@ import React, { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 const login = () => {
   const router = useRouter();
+  const { colors } = useTheme();
   const loginUser = useAction(api.useAction.loginUserAction);
-
+  const styles = useStyles();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,7 +49,7 @@ const login = () => {
 
   return (
     <LinearGradient
-      colors={purpleTheme.gradient.background}
+      colors={colors.gradient.background}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}
@@ -76,12 +77,11 @@ const login = () => {
         onChangeText={setPassword}
         secureTextEntry
       />
-
+      <View style={styles.forgotPassword}>
+        <Text style={styles.linkText}>Forgot Password ?</Text>
+      </View>
       <TouchableOpacity style={{ width: "100%" }} onPress={handleLogin}>
-        <LinearGradient
-          colors={purpleTheme.gradient.button}
-          style={styles.button}
-        >
+        <LinearGradient colors={colors.button.background} style={styles.button}>
           <Text style={styles.buttonText}>
             {loading ? "Logging in..." : "Continue"}
           </Text>
@@ -89,7 +89,7 @@ const login = () => {
       </TouchableOpacity>
 
       <View style={styles.linkContainer}>
-        <Text>Don't have an account? </Text>
+        <Text style={styles.linkGreyText}>Don't have an account? </Text>
         <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
           <Text style={styles.linkText}>Register here</Text>
         </TouchableOpacity>
