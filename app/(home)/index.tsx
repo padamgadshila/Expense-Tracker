@@ -1,8 +1,11 @@
+import { styles } from "@/assets/styles/index.style";
+import { purpleTheme } from "@/constants/color";
+import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Text } from "react-native";
-
+import { ActivityIndicator, Text, View } from "react-native";
 const Index = () => {
   const [name, setName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -11,7 +14,6 @@ const Index = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // 1️⃣ Get data from AsyncStorage
         const fname = await AsyncStorage.getItem("fname");
         const email = await AsyncStorage.getItem("email");
 
@@ -43,15 +45,34 @@ const Index = () => {
   };
 
   return (
-    <>
-      {name ? (
-        <Text style={{ fontSize: 20, fontWeight: "bold" }} onPress={logout}>
-          Welcome, {name} 👋
-        </Text>
-      ) : (
-        <Text style={{ fontSize: 18 }}>Welcome back, user!</Text>
-      )}
-    </>
+    <LinearGradient
+      colors={purpleTheme.gradient.background}
+      style={{ flex: 1, padding: 15 }}
+    >
+      <View style={styles.namecontainer}>
+        <Text style={styles.nameText}>Welcome, {name}</Text>
+        <FontAwesome
+          name="sign-out"
+          onPress={logout}
+          style={styles.logoutIcon}
+        />
+      </View>
+
+      <View style={styles.balanceContainer}>
+        <Text style={styles.greyText}>Total Balance</Text>
+        <Text style={styles.balance}>₹500000</Text>
+        <View style={styles.splitCont}>
+          <View>
+            <Text>Income</Text>
+            <Text style={styles.incomeText}>₹500000</Text>
+          </View>
+          <View>
+            <Text>Expenses</Text>
+            <Text style={styles.expenseText}>₹500000</Text>
+          </View>
+        </View>
+      </View>
+    </LinearGradient>
   );
 };
 
