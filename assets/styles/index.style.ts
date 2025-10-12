@@ -28,7 +28,6 @@ export const useStyles = () => {
       backgroundColor: colors.input.background,
       borderRadius: 12,
       padding: 16,
-      // margin: 8,
       shadowColor: colors.shadowColor,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.2,

@@ -6,7 +6,13 @@ import { useAction } from "convex/react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 const login = () => {
   const router = useRouter();
   const { colors } = useTheme();
@@ -35,7 +41,7 @@ const login = () => {
         ["fname", user.fname],
       ]);
 
-      router.push("/(home)");
+      router.push("/(home)/(tabs)");
     } catch (error) {
       if (typeof error === "object" && error !== null && "data" in error) {
         setError((error as any).data);
@@ -84,9 +90,18 @@ const login = () => {
       </View>
       <TouchableOpacity style={{ width: "100%" }} onPress={handleLogin}>
         <LinearGradient colors={colors.button.background} style={styles.button}>
-          <Text style={styles.buttonText}>
-            {loading ? "Logging in..." : "Continue"}
-          </Text>
+          {loading ? (
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <ActivityIndicator
+                size="small"
+                color={colors.button.buttonText}
+                style={{ marginRight: 8, height: "auto" }}
+              />
+              <Text style={styles.buttonText}>Loggin in...</Text>
+            </View>
+          ) : (
+            <Text style={styles.buttonText}>Login</Text>
+          )}
         </LinearGradient>
       </TouchableOpacity>
 

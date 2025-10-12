@@ -14,6 +14,7 @@ export const colors = {
       border: "#A78BFA",
       text: "#6A0DAD",
       placeHolder: "#A78BFA",
+      transcation: "#D8C6FF",
     },
     gradient: {
       background: ["#f5f0ff", "#f8e8ff"] as const,
@@ -58,6 +59,7 @@ export const colors = {
       border: "#B066FF",
       text: "#FFFFFF",
       placeHolder: "#C6A7F7",
+      transcation: "#2A1B47",
     },
     gradient: {
       background: ["#1E1128", "#2E1842"] as const,

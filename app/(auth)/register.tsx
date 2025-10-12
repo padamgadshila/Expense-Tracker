@@ -6,7 +6,13 @@ import { useAction } from "convex/react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const register = () => {
@@ -49,7 +55,7 @@ const register = () => {
         ["fname", user.fname],
       ]);
 
-      router.push("/(home)");
+      router.push("/(home)/(tabs)");
       setError("");
     } catch (error) {
       if (typeof error === "object" && error !== null && "data" in error) {
@@ -129,7 +135,14 @@ const register = () => {
             style={styles.button}
           >
             {loading ? (
-              <Text style={styles.buttonText}>Registering...</Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <ActivityIndicator
+                  size="small"
+                  color={colors.button.buttonText}
+                  style={{ marginRight: 8, height: "auto" }}
+                />
+                <Text style={styles.buttonText}>Creating account...</Text>
+              </View>
             ) : (
               <Text style={styles.buttonText}>Continue</Text>
             )}

@@ -36,9 +36,9 @@ const HomeTabs = () => {
         }}
       />
       <Tabs.Screen
-        name="add"
+        name="transaction"
         options={{
-          title: "Add",
+          title: "Transaction",
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="plus-square" color={color} size={size} />
           ),

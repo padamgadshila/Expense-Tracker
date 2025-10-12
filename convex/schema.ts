@@ -13,6 +13,7 @@ export default defineSchema({
   transactions: defineTable({
     userId: v.string(),
     amount: v.number(),
+    desc: v.string(),
     type: v.string(),
     category: v.string(),
     date: v.string(),
