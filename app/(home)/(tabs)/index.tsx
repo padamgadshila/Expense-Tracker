@@ -1,157 +1,152 @@
 import { useStyles } from "@/assets/styles/index.style";
 import Lists from "@/components/Lists";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { useTheme } from "@/hooks/themeContext";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useMutation, useQuery } from "convex/react"; // Add useQuery here
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import { useEffect, useState } from "react"; // Add useCallback
+import { ActivityIndicator, Alert, FlatList, Text, View } from "react-native";
+import Toast from "react-native-toast-message";
+
 const Index = () => {
   const [name, setName] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null); // Store userId in state
   const router = useRouter();
   const { colors, toggleTheme } = useTheme();
   const styles = useStyles();
+
+  // Fetch transactions using useQuery (reactive)
+  const transactions = useQuery(
+    api.transaction.getTransaction,
+    userId ? { userId } : "skip"
+  );
+
+  // Delete mutation
+  const deleteTransaction = useMutation(api.transaction.deleteTransaction);
+
+  // Fetch user data once on mount
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const fname = await AsyncStorage.getItem("fname");
-        const email = await AsyncStorage.getItem("email");
-
-        console.log("Loaded user:", fname, email);
-
+        const id = await AsyncStorage.getItem("userId");
         if (fname) setName(fname);
+        if (id) setUserId(id);
       } catch (error) {
-        console.error("Error loading user:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error loading user data:", error);
       }
     };
-
     fetchUserData();
   }, []);
 
-  if (loading) {
-    return (
-      <>
-        <ActivityIndicator size="large" color="#7c3aed" />
-        <Text>Loading...</Text>
-      </>
-    );
-  }
+  const formattedDate = (isoDate: string) => {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  // Format transactions for display (runs on every render, but fine for small lists)
+  const formattedTransactions = (transactions || []).map((item) => ({
+    ...item,
+    date: formattedDate(item.date),
+  }));
+
+  // // Delete handler
+  const handleDelete = async (tid: string) => {
+    try {
+      if (!userId) return;
+      Alert.alert(
+        "Warning",
+        "Are you sure you want to delete this transaction?",
+        [
+          {
+            text: "Yes",
+            onPress: async () => {
+              await deleteTransaction({
+                userId,
+                tid: tid as Id<"transactions">,
+              });
+              Toast.show({
+                type: "success",
+                text1: "Transaction deleted",
+              });
+            },
+          },
+          { text: "No", style: "cancel" },
+        ],
+        { cancelable: false }
+      );
+
+      // Optionally, refetch transactions
+      // or filter it locally:
+      // setTransactions((prev) => prev.filter((t) => t._id !== tid));
+    } catch (error) {
+      Toast.show({ type: "error", text1: "Failed to delete transaction" });
+    }
+  };
 
   const logout = async () => {
     await AsyncStorage.multiRemove(["email", "userId", "fname"]);
+    setUserId(null); // Clear state
     router.replace("/(auth)/login");
   };
-  const transactions = [
-    {
-      id: "1",
-      title: "Salary",
-      type: "Income",
-      amount: 300,
-      date: "Aug 15 2025",
-    },
-    {
-      id: "2",
-      title: "Groceries",
-      type: "Expense",
-      amount: 50,
-      date: "Aug 16 2025",
-    },
-    {
-      id: "3",
-      title: "Freelance",
-      type: "Income",
-      amount: 150,
-      date: "Aug 17 2025",
-    },
-    {
-      id: "4",
-      title: "Rent",
-      type: "Expense",
-      amount: 200,
-      date: "Aug 18 2025",
-    },
-    {
-      id: "5",
-      title: "Restaurant",
-      type: "Expense",
-      amount: 75,
-      date: "Aug 19 2025",
-    },
-    {
-      id: "6",
-      title: "Electricity Bill",
-      type: "Expense",
-      amount: 120,
-      date: "Aug 20 2025",
-    },
-    {
-      id: "7",
-      title: "Stocks Profit",
-      type: "Income",
-      amount: 90,
-      date: "Aug 21 2025",
-    },
-    {
-      id: "8",
-      title: "Internet Bill",
-      type: "Expense",
-      amount: 60,
-      date: "Aug 22 2025",
-    },
-    {
-      id: "9",
-      title: "Gift from Friend",
-      type: "Income",
-      amount: 100,
-      date: "Aug 23 2025",
-    },
-    {
-      id: "10",
-      title: "Transport",
-      type: "Expense",
-      amount: 40,
-      date: "Aug 24 2025",
-    },
-    {
-      id: "11",
-      title: "Bonus",
-      type: "Income",
-      amount: 250,
-      date: "Aug 25 2025",
-    },
-    {
-      id: "12",
-      title: "Movie Night",
-      type: "Expense",
-      amount: 30,
-      date: "Aug 26 2025",
-    },
-    {
-      id: "13",
-      title: "Dividends",
-      type: "Income",
-      amount: 80,
-      date: "Aug 27 2025",
-    },
-    {
-      id: "14",
-      title: "Coffee",
-      type: "Expense",
-      amount: 20,
-      date: "Aug 28 2025",
-    },
-    {
-      id: "15",
-      title: "Selling Old Items",
-      type: "Income",
-      amount: 110,
-      date: "Aug 29 2025",
-    },
-  ];
+
+  // Loading state while fetching userId or transactions
+  if (!userId || transactions === undefined) {
+    return (
+      <LinearGradient
+        colors={colors.gradient.background}
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <ActivityIndicator size="large" color="#7c3aed" />
+        <Text style={{ color: colors.grayText, marginTop: 10 }}>
+          Loading...
+        </Text>
+      </LinearGradient>
+    );
+  }
+
+  // Error state (if query fails)
+  if (transactions === null) {
+    // Convex useQuery returns null on error
+    return (
+      <LinearGradient
+        colors={colors.gradient.background}
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text style={{ color: colors.grayText }}>
+          Error loading transactions. Please try again.
+        </Text>
+      </LinearGradient>
+    );
+  }
+
+  const calculateSummary = (transactions = []) => {
+    const totalIncome = transactions
+      .filter((t) => t.type === "Income")
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const totalExpense = transactions
+      .filter((t) => t.type === "Expenses")
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    return {
+      totalIncome,
+      totalExpense,
+      balance: totalIncome - totalExpense,
+    };
+  };
+
+  const { totalIncome, totalExpense, balance } = calculateSummary(
+    transactions || []
+  );
 
   return (
     <LinearGradient
@@ -159,7 +154,7 @@ const Index = () => {
       style={{ flex: 1, paddingHorizontal: 15 }}
     >
       <View style={styles.namecontainer}>
-        <Text style={styles.nameText}>Hello, {name} 👋</Text>
+        <Text style={styles.nameText}>Hello, {name || "User"} 👋</Text>
         <FontAwesome
           name="sign-out"
           onPress={logout}
@@ -168,9 +163,9 @@ const Index = () => {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.greyText}>Balance</Text>
+        <Text style={styles.greyText}>Total Balance</Text>
         <Text style={styles.balance} onPress={toggleTheme}>
-          ₹500000
+          ₹{balance.toFixed(2)}
         </Text>
         <View style={styles.splitCont}>
           <View
@@ -189,7 +184,7 @@ const Index = () => {
             >
               Income
             </Text>
-            <Text style={styles.incomeText}>₹500000</Text>
+            <Text style={styles.incomeText}>₹{totalIncome.toFixed(2)}</Text>
           </View>
           <View style={styles.line} />
           <View
@@ -208,12 +203,10 @@ const Index = () => {
             >
               Expenses
             </Text>
-            <Text style={styles.expenseText}>₹500000</Text>
+            <Text style={styles.expenseText}>₹{totalExpense.toFixed(2)}</Text>
           </View>
         </View>
       </View>
-
-      {/* list */}
 
       <Text
         style={{ fontSize: 24, fontWeight: "bold", color: colors.grayText }}
@@ -223,9 +216,18 @@ const Index = () => {
 
       <FlatList
         style={{ paddingHorizontal: 3 }}
-        data={transactions}
-        renderItem={({ item }) => <Lists data={item} />}
-        keyExtractor={(item) => item.id}
+        data={formattedTransactions}
+        renderItem={({ item }) => (
+          <Lists data={item} onDelete={() => handleDelete(item._id)} />
+        )}
+        keyExtractor={(item) => item._id}
+        ListEmptyComponent={
+          <Text
+            style={{ color: colors.grayText, textAlign: "center", padding: 20 }}
+          >
+            No transactions yet.
+          </Text>
+        }
       />
     </LinearGradient>
   );

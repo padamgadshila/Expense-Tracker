@@ -45,6 +45,15 @@ const HomeTabs = () => {
         }}
       />
       <Tabs.Screen
+        name="summary"
+        options={{
+          title: "Summary",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="bar-chart" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: "settings",

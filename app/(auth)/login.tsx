@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 const login = () => {
   const router = useRouter();
   const { colors } = useTheme();
@@ -21,18 +22,15 @@ const login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleLogin = async () => {
     try {
       setLoading(true);
 
       if (!email || !password) {
-        setError("All fields are required");
+        Toast.show({ type: "error", text1: "All fields are required" });
         return;
       }
-
-      setError("");
 
       const user = await loginUser({ email, password });
       await AsyncStorage.multiSet([
@@ -40,13 +38,13 @@ const login = () => {
         ["userId", user._id],
         ["fname", user.fname],
       ]);
-
+      Toast.show({ type: "success", text1: "Login success" });
       router.push("/(home)/(tabs)");
     } catch (error) {
       if (typeof error === "object" && error !== null && "data" in error) {
-        setError((error as any).data);
+        Toast.show({ type: "error", text1: (error as any).data });
       } else {
-        setError("An unexpected error occurred");
+        Toast.show({ type: "error", text1: "An unexpected error occurred" });
       }
     } finally {
       setLoading(false);
@@ -61,12 +59,6 @@ const login = () => {
       style={styles.container}
     >
       <Text style={styles.heading}>Welcome Back</Text>
-
-      {error ? (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-        </View>
-      ) : null}
 
       <TextInput
         style={styles.input}

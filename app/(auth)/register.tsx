@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Toast from "react-native-toast-message";
 
 const register = () => {
   const router = useRouter();
@@ -27,19 +28,17 @@ const register = () => {
   const [password, setPassword] = useState("");
   const [Cpassword, setCPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleRegister = async () => {
     try {
       setLoading(true);
       if (!fname || !lname || !email || !password || !Cpassword) {
-        setError("All fields are required");
+        Toast.show({ type: "error", text1: "All fields are required" });
         return;
       }
-      setError("");
 
       if (password !== Cpassword) {
-        setError("Passwords do not match");
+        Toast.show({ type: "error", text1: "Passwords do not match" });
         return;
       }
       const user = await registerUser({
@@ -54,14 +53,13 @@ const register = () => {
         ["userId", user._id],
         ["fname", user.fname],
       ]);
-
+      Toast.show({ type: "success", text1: "Registered successfully" });
       router.push("/(home)/(tabs)");
-      setError("");
     } catch (error) {
       if (typeof error === "object" && error !== null && "data" in error) {
-        setError((error as any).data);
+        Toast.show({ type: "error", text1: (error as any).data });
       } else {
-        setError("An unexpected error occurred");
+        Toast.show({ type: "error", text1: "An unexpected error occurred" });
       }
     } finally {
       setLoading(false);
@@ -83,11 +81,6 @@ const register = () => {
         style={styles.container}
       >
         <Text style={styles.heading}>Create Account</Text>
-        {error ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        ) : null}
 
         <View style={styles.inputFlexWrapper}>
           <TextInput

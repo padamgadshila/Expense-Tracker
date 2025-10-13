@@ -1,22 +1,25 @@
 import { useStyles } from "@/assets/styles/transaction.style";
 import CategoryOption from "@/components/options";
 import { api } from "@/convex/_generated/api";
+import { category } from "@/data/category";
 import { useTheme } from "@/hooks/themeContext";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useMutation } from "convex/react";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 const add = () => {
+  const router = useRouter();
   const { colors } = useTheme();
   const styles = useStyles();
   const addtransaction = useMutation(api.transaction.addTransaction);
@@ -26,15 +29,6 @@ const add = () => {
   const [selected, setIsSelected] = useState<string | null>(null);
   const [amount, setAmount] = useState("");
   const [tname, setTname] = useState("");
-  const category = [
-    { id: 1, name: "Food & Drinks", iconName: "utensils" },
-    { id: 2, name: "Shopping", iconName: "cart-shopping" },
-    { id: 3, name: "Transportation", iconName: "car" },
-    { id: 4, name: "Bills", iconName: "file-invoice-dollar" },
-    { id: 5, name: "Entertainment", iconName: "film" },
-    { id: 6, name: "Income", iconName: "arrow-trend-up" },
-    { id: 7, name: "Others", iconName: "ellipsis" },
-  ];
 
   const handleAmountChange = (text: string) => {
     const numericText = text.replace(/[^0-9]/g, "");
@@ -50,7 +44,7 @@ const add = () => {
     try {
       setLoading(true);
       if (!type || !amount || !tname || !selected) {
-        Alert.alert("Please fill all the values");
+        Toast.show({ type: "error", text1: "Please fill all the values" });
         return;
       }
       const userId = await AsyncStorage.getItem("userId");
@@ -64,7 +58,8 @@ const add = () => {
         category: selected,
       });
 
-      Alert.alert("Transaction added successfully!");
+      Toast.show({ type: "success", text1: "Transaction added!" });
+      router.push("/(home)/(tabs)");
 
       setType(null);
       setAmount("");
@@ -72,9 +67,9 @@ const add = () => {
       setIsSelected(null);
     } catch (error) {
       if (typeof error === "object" && error !== null && "data" in error) {
-        Alert.alert((error as any).data);
+        Toast.show({ type: "error", text1: (error as any).data });
       } else {
-        Alert.alert("An unexpected error occurred");
+        Toast.show({ type: "error", text1: "An unexpected error occurred" });
       }
     } finally {
       setLoading(false);
@@ -83,106 +78,113 @@ const add = () => {
   return (
     <LinearGradient
       colors={colors.gradient.background}
-      style={styles.container}
+      style={styles.container} // just flex:1
     >
-      <Text style={styles.heading}>New Transcation</Text>
-
-      <View style={styles.card}>
-        <View style={styles.buttonWrapper}>
-          <TouchableOpacity
-            style={[styles.button, type === "Income" && styles.incomeButton]}
-            onPress={() => setType("Income")}
-          >
-            <FontAwesome
-              style={[
-                styles.buttonIcon,
-                type === "Income" && styles.incomeText,
-              ]}
-              name="arrow-circle-up"
-            />
-            <Text
-              style={[
-                styles.buttonText,
-                type === "Income" && styles.incomeText,
-              ]}
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 50 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.wrapper}>
+          <Text style={styles.heading}>New Transaction</Text>
+          <TouchableOpacity onPress={submit}>
+            <LinearGradient
+              style={styles.saveButton}
+              colors={colors.button.background}
             >
-              Income
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, type === "Expenses" && styles.expenseButton]}
-            onPress={() => setType("Expenses")}
-          >
-            <FontAwesome
-              style={[
-                styles.buttonIcon,
-                type === "Expenses" && styles.expenseText,
-              ]}
-              name="arrow-circle-down"
-            />
-            <Text
-              style={[
-                styles.buttonText,
-                type === "Expenses" && styles.expenseText,
-              ]}
-            >
-              Expense
-            </Text>
+              {isLoading ? (
+                <Text style={styles.saveButtonText}>Saving...</Text>
+              ) : (
+                <Text style={styles.saveButtonText}>Save</Text>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
         </View>
-
-        {/* input section */}
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Amount"
-            placeholderTextColor={colors.input.placeHolder}
-            keyboardType="number-pad"
-            value={amount}
-            onChangeText={handleAmountChange}
-          />
-        </View>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Transaction name"
-            placeholderTextColor={colors.input.placeHolder}
-            value={tname}
-            onChangeText={setTname}
-          />
-        </View>
-        {/* category */}
-        <Text style={styles.categoryText}>Select Category</Text>
-        <View style={styles.categoryWrapper}>
-          {category.map((item) => (
-            <CategoryOption
-              key={item.id}
-              data={item}
-              isSelected={selected === item.name}
-              onSelect={() => setIsSelected(item.name)}
-            />
-          ))}
-        </View>
-      </View>
-      <TouchableOpacity onPress={submit}>
-        <LinearGradient
-          style={styles.saveButton}
-          colors={colors.button.background}
-        >
-          {isLoading ? (
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <ActivityIndicator
-                size="small"
-                color={colors.button.buttonText}
-                style={{ marginRight: 8, height: "auto" }}
+        <View style={styles.card}>
+          <View style={styles.buttonWrapper}>
+            <TouchableOpacity
+              style={[styles.button, type === "Income" && styles.incomeButton]}
+              onPress={() => setType("Income")}
+            >
+              <FontAwesome
+                style={[
+                  styles.buttonIcon,
+                  type === "Income" && styles.incomeText,
+                ]}
+                name="arrow-circle-up"
               />
-              <Text style={styles.saveButtonText}>Saving...</Text>
-            </View>
-          ) : (
-            <Text style={styles.saveButtonText}>Save</Text>
-          )}
-        </LinearGradient>
-      </TouchableOpacity>
+              <Text
+                style={[
+                  styles.buttonText,
+                  type === "Income" && styles.incomeText,
+                ]}
+              >
+                Income
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.button,
+                type === "Expenses" && styles.expenseButton,
+              ]}
+              onPress={() => setType("Expenses")}
+            >
+              <FontAwesome
+                style={[
+                  styles.buttonIcon,
+                  type === "Expenses" && styles.expenseText,
+                ]}
+                name="arrow-circle-down"
+              />
+              <Text
+                style={[
+                  styles.buttonText,
+                  type === "Expenses" && styles.expenseText,
+                ]}
+              >
+                Expense
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Amount"
+              placeholderTextColor={colors.input.placeHolder}
+              keyboardType="number-pad"
+              value={amount}
+              onChangeText={handleAmountChange}
+            />
+          </View>
+
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Transaction name"
+              placeholderTextColor={colors.input.placeHolder}
+              value={tname}
+              onChangeText={setTname}
+            />
+          </View>
+
+          <Text style={styles.categoryText}>Select Category</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoryWrapper}
+          >
+            {category.map((item) => (
+              <CategoryOption
+                key={item.id}
+                data={item}
+                isSelected={selected === item.name}
+                onSelect={() => setIsSelected(item.name)}
+              />
+            ))}
+          </ScrollView>
+        </View>
+      </ScrollView>
     </LinearGradient>
   );
 };

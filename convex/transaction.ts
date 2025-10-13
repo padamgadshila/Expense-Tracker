@@ -1,5 +1,5 @@
 import { ConvexError, v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 export const addTransaction = mutation({
   args: {
@@ -23,5 +23,31 @@ export const addTransaction = mutation({
       throw new ConvexError("Failed to add");
     }
     return transaction;
+  },
+});
+
+export const getTransaction = query({
+  args: { userId: v.string() },
+  handler: async (ctx, { userId }) => {
+    return await ctx.db
+      .query("transactions")
+      .withIndex("userId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
+  },
+});
+
+export const deleteTransaction = mutation({
+  args: {
+    userId: v.string(),
+    tid: v.id("transactions"),
+  },
+  handler: async (ctx, { userId, tid }) => {
+    const transaction = await ctx.db.get(tid);
+    if (!transaction || transaction.userId !== userId) {
+      throw new Error("Transaction not found or not authorized");
+    }
+    await ctx.db.delete(tid);
+    return { success: true, message: "Transaction deleted successfully" };
   },
 });

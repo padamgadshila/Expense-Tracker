@@ -7,14 +7,21 @@ export const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      padding: 15,
+      padding: 10,
     },
     heading: {
-      width: "100%",
       textAlign: "center",
-      fontSize: 34,
+      fontSize: 20,
       color: colors.grayText,
       fontWeight: "bold",
+      paddingLeft: 20,
+    },
+    wrapper: {
+      width: "100%",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: 0,
     },
     card: {
       marginTop: 20,
@@ -94,7 +101,7 @@ export const useStyles = () => {
       gap: 10,
     },
     options: {
-      padding: 10,
+      padding: 8,
       borderRadius: 30,
       borderColor: colors.grayText,
       borderWidth: 1,
@@ -115,14 +122,13 @@ export const useStyles = () => {
       color: colors.grayText,
     },
     saveButton: {
-      padding: 15,
+      paddingVertical: 5,
+      width: 130,
       borderRadius: 15,
-      width: "80%",
-      alignItems: "center",
-      marginTop: 10,
-      alignSelf: "center",
+      height: 40,
     },
     saveButtonText: {
+      textAlign: "center",
       color: colors.button.buttonText,
       fontSize: 20,
       fontWeight: "bold",
