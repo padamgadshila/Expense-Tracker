@@ -10,7 +10,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  ScrollView,
+  FlatList,
   Text,
   TextInput,
   TouchableOpacity,
@@ -31,12 +31,21 @@ const add = () => {
   const [tname, setTname] = useState("");
 
   const handleAmountChange = (text: string) => {
-    const numericText = text.replace(/[^0-9]/g, "");
-    if (!numericText) {
+    const cleaned = text.replace(/[^0-9.]/g, "");
+    const parts = cleaned.split(".");
+
+    if (parts.length > 2) return;
+    if (!cleaned) {
       setAmount("");
       return;
     }
-    const formatted = Number(numericText).toLocaleString("en-IN");
+
+    const integerPart = parts[0]
+      ? Number(parts[0]).toLocaleString("en-IN")
+      : "";
+
+    const formatted =
+      parts.length === 2 ? `${integerPart}.${parts[1]}` : integerPart;
     setAmount(formatted);
   };
 
@@ -80,111 +89,108 @@ const add = () => {
       colors={colors.gradient.background}
       style={styles.container} // just flex:1
     >
-      <ScrollView
+      {/* <ScrollView
         contentContainerStyle={{ paddingBottom: 50 }}
         showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.wrapper}>
-          <Text style={styles.heading}>New Transaction</Text>
-          <TouchableOpacity onPress={submit}>
-            <LinearGradient
-              style={styles.saveButton}
-              colors={colors.button.background}
+      > */}
+      <View style={styles.wrapper}>
+        <Text style={styles.heading}>New Transaction</Text>
+        <TouchableOpacity onPress={submit}>
+          <LinearGradient
+            style={styles.saveButton}
+            colors={colors.button.background}
+          >
+            {isLoading ? (
+              <Text style={styles.saveButtonText}>Saving...</Text>
+            ) : (
+              <Text style={styles.saveButtonText}>Save</Text>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.card}>
+        <View style={styles.buttonWrapper}>
+          <TouchableOpacity
+            style={[styles.button, type === "Income" && styles.incomeButton]}
+            onPress={() => setType("Income")}
+          >
+            <FontAwesome
+              style={[
+                styles.buttonIcon,
+                type === "Income" && styles.incomeText,
+              ]}
+              name="arrow-circle-up"
+            />
+            <Text
+              style={[
+                styles.buttonText,
+                type === "Income" && styles.incomeText,
+              ]}
             >
-              {isLoading ? (
-                <Text style={styles.saveButtonText}>Saving...</Text>
-              ) : (
-                <Text style={styles.saveButtonText}>Save</Text>
-              )}
-            </LinearGradient>
+              Income
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, type === "Expenses" && styles.expenseButton]}
+            onPress={() => setType("Expenses")}
+          >
+            <FontAwesome
+              style={[
+                styles.buttonIcon,
+                type === "Expenses" && styles.expenseText,
+              ]}
+              name="arrow-circle-down"
+            />
+            <Text
+              style={[
+                styles.buttonText,
+                type === "Expenses" && styles.expenseText,
+              ]}
+            >
+              Expense
+            </Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.card}>
-          <View style={styles.buttonWrapper}>
-            <TouchableOpacity
-              style={[styles.button, type === "Income" && styles.incomeButton]}
-              onPress={() => setType("Income")}
-            >
-              <FontAwesome
-                style={[
-                  styles.buttonIcon,
-                  type === "Income" && styles.incomeText,
-                ]}
-                name="arrow-circle-up"
-              />
-              <Text
-                style={[
-                  styles.buttonText,
-                  type === "Income" && styles.incomeText,
-                ]}
-              >
-                Income
-              </Text>
-            </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[
-                styles.button,
-                type === "Expenses" && styles.expenseButton,
-              ]}
-              onPress={() => setType("Expenses")}
-            >
-              <FontAwesome
-                style={[
-                  styles.buttonIcon,
-                  type === "Expenses" && styles.expenseText,
-                ]}
-                name="arrow-circle-down"
-              />
-              <Text
-                style={[
-                  styles.buttonText,
-                  type === "Expenses" && styles.expenseText,
-                ]}
-              >
-                Expense
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.input}
-              placeholder="Amount"
-              placeholderTextColor={colors.input.placeHolder}
-              keyboardType="number-pad"
-              value={amount}
-              onChangeText={handleAmountChange}
-            />
-          </View>
-
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.input}
-              placeholder="Transaction name"
-              placeholderTextColor={colors.input.placeHolder}
-              value={tname}
-              onChangeText={setTname}
-            />
-          </View>
-
-          <Text style={styles.categoryText}>Select Category</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoryWrapper}
-          >
-            {category.map((item) => (
-              <CategoryOption
-                key={item.id}
-                data={item}
-                isSelected={selected === item.name}
-                onSelect={() => setIsSelected(item.name)}
-              />
-            ))}
-          </ScrollView>
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder="Amount"
+            placeholderTextColor={colors.input.placeHolder}
+            keyboardType="number-pad"
+            value={amount}
+            onChangeText={handleAmountChange}
+          />
         </View>
-      </ScrollView>
+
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder="Transaction name"
+            placeholderTextColor={colors.input.placeHolder}
+            value={tname}
+            onChangeText={setTname}
+          />
+        </View>
+      </View>
+      <Text style={styles.categoryText}>Select Category</Text>
+      <FlatList
+        data={category}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <CategoryOption
+            data={item}
+            isSelected={selected === item.name}
+            onSelect={() => setIsSelected(item.name)}
+          />
+        )}
+        showsVerticalScrollIndicator={true}
+        numColumns={2}
+        columnWrapperStyle={{ marginBottom: 10, gap: 10 }}
+        style={{ padding: 10 }}
+      />
+      {/* </ScrollView> */}
     </LinearGradient>
   );
 };

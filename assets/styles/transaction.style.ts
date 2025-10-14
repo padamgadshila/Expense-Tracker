@@ -88,8 +88,9 @@ export const useStyles = () => {
     },
     categoryText: {
       marginVertical: 10,
+      marginLeft: 20,
       width: "100%",
-      textAlign: "left",
+      // textAlign: "left",
       fontSize: 20,
       color: colors.grayText,
       fontWeight: "bold",

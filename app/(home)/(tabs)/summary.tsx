@@ -1,3 +1,4 @@
+import { useStyles } from "@/assets/styles/index.style";
 import { api } from "@/convex/_generated/api";
 import { useTheme } from "@/hooks/themeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -13,7 +14,6 @@ import {
 } from "react-native";
 import { PieChart } from "react-native-chart-kit";
 
-// Define Transaction type
 interface Transaction {
   _id: string;
   amount: number;
@@ -44,8 +44,8 @@ const COLORS = [
 const Summary = () => {
   const { colors } = useTheme();
   const [userId, setUserId] = useState<string | null>(null);
-
-  // Fetch userId from AsyncStorage
+  const styles = useStyles();
+  // ✅ Fetch userId from AsyncStorage
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -58,14 +58,14 @@ const Summary = () => {
     fetchUserId();
   }, []);
 
-  // Fetch transactions using Convex
+  // ✅ Fetch transactions from Convex
   const transactions = useQuery(
     api.transaction.getTransaction,
     userId ? { userId } : "skip"
   );
 
-  // Loading state
-  if (!userId) {
+  // ✅ Loading state for userId or transactions
+  if (!userId || !transactions) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -76,7 +76,12 @@ const Summary = () => {
     );
   }
 
-  // Calculate totals and category totals
+  const safeTransactions: Transaction[] = transactions.map((t) => ({
+    ...t,
+    type: t.type === "Income" ? "Income" : "Expenses",
+  }));
+
+  // ✅ Calculate totals
   const calculateSummary = (transactions: Transaction[]) => {
     let totalIncome = 0;
     let totalExpense = 0;
@@ -95,11 +100,11 @@ const Summary = () => {
   };
 
   const { totalIncome, totalExpense, balance, categoryTotals } =
-    transactions.length
-      ? calculateSummary(transactions)
+    safeTransactions.length
+      ? calculateSummary(safeTransactions)
       : { totalIncome: 0, totalExpense: 0, balance: 0, categoryTotals: {} };
 
-  // Prepare PieChart data
+  // ✅ Prepare PieChart data
   const chartData = Object.entries(categoryTotals)
     .filter(([_, value]) => value !== 0)
     .map(([name, value], index) => ({
@@ -113,53 +118,33 @@ const Summary = () => {
   const screenWidth = Dimensions.get("window").width - 30; // padding
 
   return (
-    <LinearGradient colors={colors.gradient.background} style={{ flex: 1 }}>
-      <ScrollView style={{ flex: 1, padding: 15 }}>
-        <Text
-          style={{
-            fontSize: 26,
-            fontWeight: "bold",
-            color: colors.grayText,
-            marginBottom: 15,
-          }}
-        >
-          Summary
-        </Text>
+    <LinearGradient
+      colors={colors.gradient.background}
+      style={{ flex: 1, paddingHorizontal: 15 }}
+    >
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 10 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.nameText}>Summary</Text>
 
-        {/* Balance Card */}
-        <View
-          style={{
-            backgroundColor: colors.input.background,
-            padding: 20,
-            borderRadius: 15,
-            marginBottom: 20,
-          }}
-        >
-          <Text style={{ color: colors.grayText }}>Balance</Text>
-          <Text
-            style={{ fontSize: 28, fontWeight: "bold", color: colors.primary }}
-          >
-            ₹{balance}
-          </Text>
+        {/* ✅ Balance Card */}
+        <View style={styles.card}>
+          <Text style={styles.greyText}>Balance</Text>
+          <Text style={styles.balance}>₹{balance}</Text>
 
-          <View
-            style={{
-              flexDirection: "row",
-              marginTop: 15,
-              justifyContent: "space-between",
-            }}
-          >
+          <View style={styles.splitCont}>
             <View style={{ alignItems: "center", width: "50%" }}>
-              <Text style={{ color: colors.grayText }}>Income</Text>
               <Text
                 style={{
-                  fontSize: 20,
-                  fontWeight: "bold",
-                  color: colors.success.text,
+                  color: colors.grayText,
+                  fontSize: 16,
+                  fontWeight: "600",
                 }}
               >
-                ₹{totalIncome}
+                Income
               </Text>
+              <Text style={styles.incomeText}>₹{totalIncome}</Text>
             </View>
             <View
               style={{
@@ -168,22 +153,28 @@ const Summary = () => {
                 opacity: 0.3,
               }}
             />
-            <View style={{ alignItems: "center", width: "50%" }}>
-              <Text style={{ color: colors.grayText }}>Expenses</Text>
+            <View
+              style={{
+                flexDirection: "column",
+                alignItems: "center",
+                width: "50%",
+              }}
+            >
               <Text
                 style={{
-                  fontSize: 20,
-                  fontWeight: "bold",
-                  color: colors.error.text,
+                  color: colors.grayText,
+                  fontSize: 16,
+                  fontWeight: "600",
                 }}
               >
-                ₹{totalExpense}
+                Expenses
               </Text>
+              <Text style={styles.expenseText}>₹{totalExpense}</Text>
             </View>
           </View>
         </View>
 
-        {/* Pie Chart */}
+        {/* ✅ Pie Chart */}
         {chartData.length > 0 ? (
           <>
             <Text
@@ -191,7 +182,7 @@ const Summary = () => {
                 fontSize: 18,
                 fontWeight: "600",
                 color: colors.grayText,
-                marginBottom: 10,
+                marginVertical: 10,
               }}
             >
               Category Breakdown
@@ -203,7 +194,7 @@ const Summary = () => {
               chartConfig={{
                 backgroundGradientFrom: "#6A0DAD",
                 backgroundGradientTo: "#D8C6FF",
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // color of slices / text
+                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                 strokeWidth: 2,
                 useShadowColorFromDataset: false,
@@ -226,7 +217,7 @@ const Summary = () => {
           </Text>
         )}
 
-        {/* Details by Category */}
+        {/* ✅ Details by Category */}
         <Text
           style={{
             fontSize: 18,

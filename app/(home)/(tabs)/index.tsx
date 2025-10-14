@@ -3,7 +3,6 @@ import Lists from "@/components/Lists";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useTheme } from "@/hooks/themeContext";
-import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useMutation, useQuery } from "convex/react"; // Add useQuery here
 import { LinearGradient } from "expo-linear-gradient";
@@ -12,21 +11,21 @@ import { useEffect, useState } from "react"; // Add useCallback
 import { ActivityIndicator, Alert, FlatList, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
+interface Transaction {
+  _id: string;
+  amount: number;
+  desc: string;
+  type: "Income" | "Expenses";
+  category: string;
+  date: string;
+}
+
 const Index = () => {
   const [name, setName] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null); // Store userId in state
   const router = useRouter();
   const { colors, toggleTheme } = useTheme();
   const styles = useStyles();
-
-  // Fetch transactions using useQuery (reactive)
-  const transactions = useQuery(
-    api.transaction.getTransaction,
-    userId ? { userId } : "skip"
-  );
-
-  // Delete mutation
-  const deleteTransaction = useMutation(api.transaction.deleteTransaction);
 
   // Fetch user data once on mount
   useEffect(() => {
@@ -36,12 +35,41 @@ const Index = () => {
         const id = await AsyncStorage.getItem("userId");
         if (fname) setName(fname);
         if (id) setUserId(id);
+        router.push("/(home)/(tabs)/settings");
       } catch (error) {
         console.error("Error loading user data:", error);
       }
     };
     fetchUserData();
   }, []);
+  // fetch transactions
+  const transactions = useQuery(
+    api.transaction.getTransaction,
+    userId ? { userId } : "skip"
+  );
+
+  // Delete mutation
+  const deleteTransaction = useMutation(api.transaction.deleteTransaction);
+
+  // Loading state while fetching userId or transactions
+  if (!userId || transactions === undefined) {
+    return (
+      <LinearGradient
+        colors={colors.gradient.background}
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <ActivityIndicator size="large" color="#7c3aed" />
+        <Text style={{ color: colors.grayText, marginTop: 10 }}>
+          Loading...
+        </Text>
+      </LinearGradient>
+    );
+  }
+
+  const safeTransactions: Transaction[] = transactions.map((t) => ({
+    ...t,
+    type: t.type === "Income" ? "Income" : "Expenses",
+  }));
 
   const formattedDate = (isoDate: string) => {
     const date = new Date(isoDate);
@@ -83,10 +111,6 @@ const Index = () => {
         ],
         { cancelable: false }
       );
-
-      // Optionally, refetch transactions
-      // or filter it locally:
-      // setTransactions((prev) => prev.filter((t) => t._id !== tid));
     } catch (error) {
       Toast.show({ type: "error", text1: "Failed to delete transaction" });
     }
@@ -97,21 +121,6 @@ const Index = () => {
     setUserId(null); // Clear state
     router.replace("/(auth)/login");
   };
-
-  // Loading state while fetching userId or transactions
-  if (!userId || transactions === undefined) {
-    return (
-      <LinearGradient
-        colors={colors.gradient.background}
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-      >
-        <ActivityIndicator size="large" color="#7c3aed" />
-        <Text style={{ color: colors.grayText, marginTop: 10 }}>
-          Loading...
-        </Text>
-      </LinearGradient>
-    );
-  }
 
   // Error state (if query fails)
   if (transactions === null) {
@@ -128,7 +137,7 @@ const Index = () => {
     );
   }
 
-  const calculateSummary = (transactions = []) => {
+  const calculateSummary = (transactions: Transaction[]) => {
     const totalIncome = transactions
       .filter((t) => t.type === "Income")
       .reduce((sum, t) => sum + t.amount, 0);
@@ -144,9 +153,9 @@ const Index = () => {
     };
   };
 
-  const { totalIncome, totalExpense, balance } = calculateSummary(
-    transactions || []
-  );
+  const { totalIncome, totalExpense, balance } = safeTransactions.length
+    ? calculateSummary(safeTransactions)
+    : { totalIncome: 0, totalExpense: 0, balance: 0 };
 
   return (
     <LinearGradient
@@ -155,11 +164,6 @@ const Index = () => {
     >
       <View style={styles.namecontainer}>
         <Text style={styles.nameText}>Hello, {name || "User"} 👋</Text>
-        <FontAwesome
-          name="sign-out"
-          onPress={logout}
-          style={styles.logoutIcon}
-        />
       </View>
 
       <View style={styles.card}>
