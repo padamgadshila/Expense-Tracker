@@ -91,5 +91,32 @@ export const useStyles = () => {
       fontSize: 19,
       textAlign: "center",
     },
+
+    title: {
+      fontSize: 24,
+      fontWeight: "bold",
+      textAlign: "center",
+      marginBottom: 30,
+    },
+    otpContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 30,
+      gap: 10,
+    },
+    otpInput: {
+      borderWidth: 1,
+      borderRadius: 8,
+      width: 45,
+      height: 55,
+      fontSize: 20,
+    },
+    passwordInput: {
+      borderWidth: 1,
+      borderRadius: 8,
+      height: 50,
+      paddingHorizontal: 15,
+      marginBottom: 15,
+    },
   });
 };

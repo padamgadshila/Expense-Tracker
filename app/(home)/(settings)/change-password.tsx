@@ -1,6 +1,9 @@
 import { useStyles } from "@/assets/styles/settings.style";
+import { api } from "@/convex/_generated/api";
 import { useTheme } from "@/hooks/themeContext";
 import { FontAwesome } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAction } from "convex/react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -11,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 const ChangePassword = () => {
   const router = useRouter();
@@ -21,6 +25,42 @@ const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
   const [Cpassword, setCPassword] = useState("");
+
+  const ChangePassword = useAction(api.useAction.chnagePasswordAction);
+
+  const handlePasswordChange = async () => {
+    if (!oldPassword || !password || !Cpassword) {
+      Toast.show({ type: "error", text1: "Please fill all fields" });
+      return;
+    }
+
+    if (password !== Cpassword) {
+      Toast.show({ type: "error", text1: "New passwords do not match" });
+      return;
+    }
+
+    const email = await AsyncStorage.getItem("email");
+
+    try {
+      setLoading(true);
+
+      await ChangePassword({
+        email: email!,
+        oldPassword,
+        newPassword: password,
+      });
+      Toast.show({ type: "success", text1: "Password changed successfully" });
+      router.replace("/(home)/(tabs)");
+    } catch (error) {
+      if (typeof error === "object" && error !== null && "data" in error) {
+        Toast.show({ type: "error", text1: (error as any).data });
+      } else {
+        Toast.show({ type: "error", text1: "An unexpected error occurred" });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <LinearGradient
@@ -64,7 +104,10 @@ const ChangePassword = () => {
             secureTextEntry={true}
           />
 
-          <TouchableOpacity style={{ width: "100%" }}>
+          <TouchableOpacity
+            style={{ width: "100%" }}
+            onPress={handlePasswordChange}
+          >
             <LinearGradient
               colors={colors.button.background}
               style={styles.button}

@@ -1,5 +1,6 @@
 import { useStyles } from "@/assets/styles/index.style";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { useTheme } from "@/hooks/themeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery } from "convex/react";
@@ -61,7 +62,7 @@ const Summary = () => {
   // ✅ Fetch transactions from Convex
   const transactions = useQuery(
     api.transaction.getTransaction,
-    userId ? { userId } : "skip"
+    userId ? { userId: userId as Id<"users"> } : "skip"
   );
 
   // ✅ Loading state for userId or transactions
@@ -123,12 +124,11 @@ const Summary = () => {
       style={{ flex: 1, paddingHorizontal: 15 }}
     >
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 10 }}
+        contentContainerStyle={{ paddingBottom: 10, paddingHorizontal: 5 }}
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.nameText}>Summary</Text>
 
-        {/* ✅ Balance Card */}
         <View style={styles.card}>
           <Text style={styles.greyText}>Balance</Text>
           <Text style={styles.balance}>₹{balance}</Text>

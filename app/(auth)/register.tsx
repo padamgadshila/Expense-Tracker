@@ -129,12 +129,13 @@ const register = () => {
           >
             {loading ? (
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <ActivityIndicator
-                  size="small"
-                  color={colors.button.buttonText}
-                  style={{ marginRight: 8, height: "auto" }}
-                />
-                <Text style={styles.buttonText}>Creating account...</Text>
+                <Text style={styles.buttonText}>
+                  {" "}
+                  <ActivityIndicator
+                    size="small"
+                    color={colors.button.buttonText}
+                  />
+                </Text>
               </View>
             ) : (
               <Text style={styles.buttonText}>Continue</Text>

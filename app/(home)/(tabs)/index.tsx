@@ -4,10 +4,10 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useTheme } from "@/hooks/themeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useMutation, useQuery } from "convex/react"; // Add useQuery here
+import { useMutation, useQuery } from "convex/react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react"; // Add useCallback
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -22,7 +22,7 @@ interface Transaction {
 
 const Index = () => {
   const [name, setName] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null); // Store userId in state
+  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
   const { colors, toggleTheme } = useTheme();
   const styles = useStyles();
@@ -35,7 +35,6 @@ const Index = () => {
         const id = await AsyncStorage.getItem("userId");
         if (fname) setName(fname);
         if (id) setUserId(id);
-        router.push("/(home)/(tabs)/settings");
       } catch (error) {
         console.error("Error loading user data:", error);
       }
@@ -45,7 +44,7 @@ const Index = () => {
   // fetch transactions
   const transactions = useQuery(
     api.transaction.getTransaction,
-    userId ? { userId } : "skip"
+    userId ? { userId: userId as Id<"users"> } : "skip"
   );
 
   // Delete mutation
@@ -94,6 +93,7 @@ const Index = () => {
         "Warning",
         "Are you sure you want to delete this transaction?",
         [
+          { text: "No", style: "cancel" },
           {
             text: "Yes",
             onPress: async () => {
@@ -107,7 +107,6 @@ const Index = () => {
               });
             },
           },
-          { text: "No", style: "cancel" },
         ],
         { cancelable: false }
       );
@@ -116,15 +115,7 @@ const Index = () => {
     }
   };
 
-  const logout = async () => {
-    await AsyncStorage.multiRemove(["email", "userId", "fname"]);
-    setUserId(null); // Clear state
-    router.replace("/(auth)/login");
-  };
-
-  // Error state (if query fails)
   if (transactions === null) {
-    // Convex useQuery returns null on error
     return (
       <LinearGradient
         colors={colors.gradient.background}
@@ -163,7 +154,7 @@ const Index = () => {
       style={{ flex: 1, paddingHorizontal: 15 }}
     >
       <View style={styles.namecontainer}>
-        <Text style={styles.nameText}>Hello, {name || "User"} 👋</Text>
+        <Text style={styles.nameText}>Hello, {name || "User"}</Text>
       </View>
 
       <View style={styles.card}>
@@ -213,7 +204,12 @@ const Index = () => {
       </View>
 
       <Text
-        style={{ fontSize: 24, fontWeight: "bold", color: colors.grayText }}
+        style={{
+          fontSize: 24,
+          fontWeight: "bold",
+          color: colors.grayText,
+          marginVertical: 10,
+        }}
       >
         Recent Transactions
       </Text>

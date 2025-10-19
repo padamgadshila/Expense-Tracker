@@ -3,7 +3,7 @@ import { mutation, query } from "./_generated/server";
 
 export const addTransaction = mutation({
   args: {
-    userId: v.string(),
+    userId: v.id("users"),
     amount: v.number(),
     desc: v.string(),
     type: v.string(),
@@ -27,7 +27,7 @@ export const addTransaction = mutation({
 });
 
 export const getTransaction = query({
-  args: { userId: v.string() },
+  args: { userId: v.id("users") },
   handler: async (ctx, { userId }) => {
     return await ctx.db
       .query("transactions")
@@ -49,5 +49,15 @@ export const deleteTransaction = mutation({
     }
     await ctx.db.delete(tid);
     return { success: true, message: "Transaction deleted successfully" };
+  },
+});
+
+export const getTransactionById = query({
+  args: { id: v.id("transactions") },
+  handler: async (ctx, { id }) => {
+    const transaction = await ctx.db.get(id);
+
+    if (!transaction) throw new Error("Transaction not found");
+    return transaction;
   },
 });

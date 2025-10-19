@@ -1,7 +1,9 @@
+import { api } from "@/convex/_generated/api";
 import { useTheme } from "@/hooks/themeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useMutation } from "convex/react";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -12,18 +14,18 @@ import {
 } from "react-native";
 
 const Settings = () => {
-  const { colors, toggleTheme } = useTheme();
+  const { colors, toggleTheme, theme } = useTheme();
   const router = useRouter();
 
   // Preferences states
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [dailySummaryEnabled, setDailySummaryEnabled] = useState(true);
-
+  const deleteAccount = useMutation(api.users.deleteAll);
   // Handlers
   const handleThemeToggle = () => {
     setIsDarkMode(!isDarkMode);
-    toggleTheme(); // your existing theme toggle function
+    toggleTheme();
   };
 
   const handleLogout = async () => {
@@ -31,7 +33,7 @@ const Settings = () => {
     router.replace("/(auth)/login");
   };
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     Alert.alert(
       "Delete Account",
       "Are you sure you want to delete your account? This action cannot be undone.",
@@ -40,7 +42,22 @@ const Settings = () => {
         {
           text: "Delete",
           style: "destructive",
-          onPress: () => console.log("Account deleted"),
+          onPress: async () => {
+            try {
+              const email = await AsyncStorage.getItem("email");
+              if (!email) {
+                console.log("No email found");
+                return;
+              }
+
+              await deleteAccount({ email });
+
+              await AsyncStorage.multiRemove(["email", "userId", "fname"]);
+              router.replace("/(auth)/login");
+            } catch (error: any) {
+              console.log("Error deleting account:", error.message || error);
+            }
+          },
         },
       ]
     );
@@ -53,6 +70,10 @@ const Settings = () => {
   const handleRateApp = () => {
     console.log("Open rating link");
   };
+
+  useEffect(() => {
+    setIsDarkMode(theme === "dark");
+  }, [theme]);
 
   return (
     <ScrollView

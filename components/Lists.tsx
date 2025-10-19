@@ -24,7 +24,17 @@ const Lists = ({ data, onDelete }: ListsProps) => {
   const categoryItem = category.find((item) => item.name === data.category);
   return (
     <View style={styles.list}>
-      <View style={styles.iconCont}>
+      <View
+        style={[
+          styles.iconCont,
+          {
+            backgroundColor:
+              data.type === "Income"
+                ? colors.success.background
+                : colors.error.background,
+          },
+        ]}
+      >
         <FontAwesome6
           name={categoryItem?.iconName || ""}
           color={
@@ -37,7 +47,11 @@ const Lists = ({ data, onDelete }: ListsProps) => {
       <View style={styles.listSplit}>
         <View style={{ alignItems: "flex-start" }}>
           <Text
-            style={{ fontSize: 20, fontWeight: "bold", color: colors.grayText }}
+            style={{
+              fontSize: 20,
+              fontWeight: "bold",
+              color: colors.grayText,
+            }}
           >
             {data.desc}
           </Text>
@@ -62,7 +76,12 @@ const Lists = ({ data, onDelete }: ListsProps) => {
       </View>
 
       <TouchableOpacity
-        style={styles.iconCont}
+        style={[
+          styles.iconCont,
+          {
+            backgroundColor: colors.error.background,
+          },
+        ]}
         onPress={() => onDelete(data._id)}
       >
         <FontAwesome6

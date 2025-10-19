@@ -77,19 +77,23 @@ const login = () => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <View style={styles.forgotPassword}>
+      <TouchableOpacity
+        style={styles.forgotPassword}
+        onPress={() => router.push("/(auth)/recovery")}
+      >
         <Text style={styles.linkText}>Forgot Password ?</Text>
-      </View>
+      </TouchableOpacity>
       <TouchableOpacity style={{ width: "100%" }} onPress={handleLogin}>
         <LinearGradient colors={colors.button.background} style={styles.button}>
           {loading ? (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <ActivityIndicator
-                size="small"
-                color={colors.button.buttonText}
-                style={{ marginRight: 8, height: "auto" }}
-              />
-              <Text style={styles.buttonText}>Loggin in...</Text>
+              <Text style={styles.buttonText}>
+                {" "}
+                <ActivityIndicator
+                  size="small"
+                  color={colors.button.buttonText}
+                />
+              </Text>
             </View>
           ) : (
             <Text style={styles.buttonText}>Login</Text>
